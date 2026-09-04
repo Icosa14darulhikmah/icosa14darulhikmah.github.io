@@ -9,6 +9,7 @@ body {
     color: #00f3ff;
     font-family: 'Rajdhani', sans-serif;
     height: 100vh;
+    width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -73,10 +74,15 @@ body {
     z-index: 3;
     text-align: center;
     padding: 20px;
-    max-width: 800px;
+    max-width: 900px;
+    width: 100%;
     transition: opacity 1s ease, transform 1s ease;
     opacity: 1;
     transform: scale(1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Background animated grid */
@@ -116,7 +122,7 @@ body {
     font-weight: 700;
     letter-spacing: 0.5em;
     color: #b0f8ff;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     text-shadow: 
         0 0 2px #00f3ff,
         0 0 5px #00f3ff,
@@ -131,7 +137,7 @@ body {
     font-weight: 900;
     letter-spacing: 0.1em;
     color: #ffffff;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
     position: relative;
     display: inline-block;
     text-shadow: 
@@ -209,12 +215,12 @@ body {
 
 /* Event Theme */
 .event-theme {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 500;
     font-style: italic;
     color: #d0f8ff;
     letter-spacing: 0.05em;
-    margin-bottom: 40px;
+    margin-bottom: 25px;
     text-shadow: 
         0 0 3px #00f3ff,
         0 0 8px #00f3ff,
@@ -226,17 +232,17 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 25px;
-    flex-wrap: wrap;
-    margin-bottom: 35px;
+    gap: 20px;
+    flex-wrap: nowrap;
+    margin-bottom: 25px;
 }
 
 .time-box {
     background: rgba(8, 20, 38, 0.65);
     border: 1px solid rgba(0, 243, 255, 0.4);
     border-radius: 12px;
-    padding: 20px 25px;
-    min-width: 110px;
+    padding: 15px 20px;
+    min-width: 100px;
     box-shadow: 
         0 0 5px rgba(0, 243, 255, 0.3),
         0 0 15px rgba(0, 243, 255, 0.2),
@@ -257,7 +263,7 @@ body {
 .number {
     display: block;
     font-family: 'Orbitron', sans-serif;
-    font-size: 3.8rem;
+    font-size: 3.2rem;
     font-weight: 700;
     color: #ffffff;
     line-height: 1;
@@ -265,16 +271,15 @@ body {
         0 0 2px #ffffff,
         0 0 6px #00f3ff,
         0 0 14px #00f3ff,
-        0 0 28px #00a8ff,
-        0 0 45px #00a8ff;
-    margin-bottom: 8px;
+        0 0 28px #00a8ff;
+    margin-bottom: 5px;
 }
 
 /* Labels */
 .label {
     display: block;
     font-family: 'Rajdhani', sans-serif;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.2em;
     color: #80f7ff;
@@ -288,7 +293,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
     flex-wrap: wrap;
 }
 
@@ -296,10 +301,10 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 12px 24px;
+    gap: 8px;
+    padding: 10px 20px;
     font-family: 'Rajdhani', sans-serif;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-decoration: none;
@@ -349,15 +354,53 @@ body {
     transform: translateY(-3px);
 }
 
-/* Responsive */
-@media (max-width: 600px) {
-    .start-text { font-size: 1.1rem; }
-    .event-title { font-size: 2.5rem; }
-    .event-theme { font-size: 1.1rem; }
-    .countdown-container { gap: 12px; margin-bottom: 25px; }
-    .time-box { padding: 12px 15px; min-width: 75px; }
-    .number { font-size: 2.2rem; }
-    .label { font-size: 0.8rem; }
-    .button-group { gap: 12px; flex-direction: column; width: 100%; }
-    .btn { width: 100%; max-width: 280px; }
+/* ========================================================
+   LANDSCAPE MOBILE ADAPTIVE RESPONSIVE (KHUSUS TAMPILAN HP)
+   ======================================================== */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .container {
+        padding: 5px 10px;
+    }
+    .coming-soon {
+        font-size: 0.75rem;
+        letter-spacing: 0.3em;
+        margin-bottom: 2px;
+    }
+    .event-title {
+        font-size: 2.1rem;
+        margin-bottom: 0px;
+    }
+    .event-theme {
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+    }
+    .countdown-container {
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    .time-box {
+        padding: 6px 12px;
+        min-width: 65px;
+        border-radius: 8px;
+    }
+    .number {
+        font-size: 1.8rem;
+        margin-bottom: 2px;
+    }
+    .label {
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+    }
+    .button-group {
+        gap: 10px;
+        flex-direction: row;
+    }
+    .btn {
+        padding: 5px 14px;
+        font-size: 0.75rem;
+        border-radius: 6px;
+    }
+    .start-text {
+        font-size: 0.95rem;
+    }
 }
