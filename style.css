@@ -5,8 +5,8 @@
 }
 
 body {
-    background-color: #030712;
-    color: #00f3ff;
+    background-color: #06080F;
+    color: #EDEFF3;
     font-family: 'Rajdhani', sans-serif;
     height: 100vh;
     width: 100vw;
@@ -27,7 +27,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: #030712;
+    background: #06080F;
     z-index: 100;
     display: flex;
     justify-content: center;
@@ -38,21 +38,21 @@ body {
 }
 
 .start-text {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #ffffff;
-    letter-spacing: 0.1em;
-    text-shadow: 
-        0 0 5px #00f3ff,
-        0 0 15px #00f3ff,
-        0 0 30px #00a8ff;
-    animation: pulseText 1.8s infinite alternate;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #F1E6C8;
+    letter-spacing: 0.06em;
+    text-shadow:
+        0 0 6px rgba(201, 162, 39, 0.55),
+        0 0 20px rgba(201, 162, 39, 0.3);
+    animation: pulseText 2.4s infinite alternate;
 }
 
 @keyframes pulseText {
-    0% { opacity: 0.3; transform: scale(0.98); }
-    100% { opacity: 1; transform: scale(1.02); }
+    0% { opacity: 0.45; transform: scale(0.99); }
+    100% { opacity: 1; transform: scale(1.01); }
 }
 
 .start-screen.fade-out {
@@ -85,6 +85,30 @@ body {
     justify-content: center;
 }
 
+/* Emblem wings watermark, seated quietly behind the title */
+.container::before {
+    content: "";
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    width: 780px;
+    max-width: 130vw;
+    height: 420px;
+    transform: translate(-50%, -50%);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 500'%3E%3Cg fill='none' stroke='%23C9A227' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M450 250 C 380 150, 250 120, 60 180 C 180 200, 260 230, 300 260 C 220 250, 140 260, 40 300 C 160 300, 260 320, 320 300 C 260 320, 180 350, 90 380 C 220 360, 300 340, 350 300'/%3E%3Cpath d='M450 250 C 520 150, 650 120, 840 180 C 720 200, 640 230, 600 260 C 680 250, 760 260, 860 300 C 740 300, 640 320, 580 300 C 640 320, 720 350, 810 380 C 680 360, 600 340, 550 300'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    opacity: 0.1;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.container > * {
+    position: relative;
+    z-index: 1;
+}
+
 /* Background animated grid */
 .grid-bg {
     position: absolute;
@@ -92,11 +116,11 @@ body {
     height: 200%;
     top: -50%;
     left: -50%;
-    background-image: 
-        linear-gradient(to right, rgba(0, 243, 255, 0.08) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0, 243, 255, 0.08) 1px, transparent 1px);
+    background-image:
+        linear-gradient(to right, rgba(201, 162, 39, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(201, 162, 39, 0.05) 1px, transparent 1px);
     background-size: 50px 50px;
-    animation: moveGrid 15s linear infinite;
+    animation: moveGrid 32s linear infinite;
     z-index: 1;
 }
 
@@ -110,42 +134,40 @@ body {
     position: absolute;
     width: 100vh;
     height: 100vh;
-    background: radial-gradient(circle, rgba(0, 243, 255, 0.15) 0%, rgba(3, 7, 18, 0) 70%);
+    background: radial-gradient(circle, rgba(201, 162, 39, 0.09) 0%, rgba(6, 8, 15, 0) 70%);
     z-index: 2;
     pointer-events: none;
 }
 
 /* COMING SOON Header */
 .coming-soon {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.2rem;
-    font-weight: 700;
-    letter-spacing: 0.5em;
-    color: #b0f8ff;
-    margin-bottom: 5px;
-    text-shadow: 
-        0 0 2px #00f3ff,
-        0 0 5px #00f3ff,
-        0 0 12px rgba(0, 243, 255, 0.8);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.55em;
+    color: #A8AEBD;
+    margin-bottom: 8px;
+    text-shadow:
+        0 0 2px rgba(201, 162, 39, 0.5),
+        0 0 10px rgba(201, 162, 39, 0.25);
     text-transform: uppercase;
 }
 
-/* HEAVY GLITCH NEON ANIMATION (ICOSA 14) */
+/* REFINED GLITCH — ICOSA 14 */
 .event-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 4rem;
-    font-weight: 900;
-    letter-spacing: 0.1em;
-    color: #ffffff;
-    margin-bottom: 2px;
+    font-family: 'Cinzel', serif;
+    font-size: 3.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #F6EFDD;
+    margin-bottom: 6px;
     position: relative;
     display: inline-block;
-    text-shadow: 
-        0 0 5px #fff,
-        0 0 10px #00f3ff,
-        0 0 20px #00f3ff,
-        0 0 40px #00a8ff;
-    animation: main-glitch 2s infinite steps(1);
+    text-shadow:
+        0 0 4px rgba(246, 239, 221, 0.5),
+        0 0 16px rgba(201, 162, 39, 0.45),
+        0 0 34px rgba(201, 162, 39, 0.25);
+    animation: main-glitch 3s infinite steps(1);
 }
 
 .glitch::before,
@@ -156,75 +178,82 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: #030712;
+    background: #06080F;
 }
 
 .glitch::before {
-    left: 3px;
-    text-shadow: -3px 0 #ff0055, 0 0 15px #ff0055;
+    left: 2px;
+    text-shadow: -2px 0 #7A3B45, 0 0 12px rgba(122, 59, 69, 0.6);
     clip-path: inset(0 0 0 0);
-    animation: glitch-anim-1 1.2s infinite linear alternate-reverse;
+    animation: glitch-anim-1 1.6s infinite linear alternate-reverse;
 }
 
 .glitch::after {
-    left: -3px;
-    text-shadow: 3px 0 #00f3ff, 0 0 15px #00f3ff;
+    left: -2px;
+    text-shadow: 2px 0 #D9C48A, 0 0 12px rgba(217, 196, 138, 0.6);
     clip-path: inset(0 0 0 0);
-    animation: glitch-anim-2 1.5s infinite linear alternate-reverse;
+    animation: glitch-anim-2 2s infinite linear alternate-reverse;
 }
 
 @keyframes main-glitch {
     0%, 100% { transform: translate(0, 0); }
-    92% { transform: translate(0, 0); }
-    93% { transform: translate(-3px, 2px); }
-    94% { transform: translate(3px, -1px); }
-    95% { transform: translate(-1px, -3px); }
-    96% { transform: translate(3px, 2px); }
-    97% { transform: translate(-2px, 0); }
-    98% { transform: translate(2px, -2px); }
-    99% { transform: translate(-1px, 1px); }
+    94% { transform: translate(0, 0); }
+    95% { transform: translate(-2px, 1px); }
+    96% { transform: translate(2px, -1px); }
+    97% { transform: translate(-1px, -1px); }
+    98% { transform: translate(1px, 1px); }
+    99% { transform: translate(-1px, 0); }
 }
 
 @keyframes glitch-anim-1 {
-    0% { clip-path: inset(20% 0 60% 0); transform: translate(-4px, 0); }
-    10% { clip-path: inset(80% 0 5% 0); transform: translate(4px, 0); }
-    20% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 0); }
-    30% { clip-path: inset(50% 0 30% 0); transform: translate(5px, 0); }
-    40% { clip-path: inset(70% 0 15% 0); transform: translate(-5px, 0); }
-    50% { clip-path: inset(5% 0 85% 0); transform: translate(3px, 0); }
-    60% { clip-path: inset(40% 0 40% 0); transform: translate(-3px, 0); }
-    70% { clip-path: inset(85% 0 2% 0); transform: translate(4px, 0); }
-    80% { clip-path: inset(25% 0 55% 0); transform: translate(-4px, 0); }
-    90% { clip-path: inset(60% 0 20% 0); transform: translate(2px, 0); }
-    100% { clip-path: inset(15% 0 65% 0); transform: translate(-2px, 0); }
+    0% { clip-path: inset(20% 0 60% 0); transform: translate(-2px, 0); }
+    10% { clip-path: inset(80% 0 5% 0); transform: translate(2px, 0); }
+    20% { clip-path: inset(10% 0 80% 0); transform: translate(-1px, 0); }
+    30% { clip-path: inset(50% 0 30% 0); transform: translate(3px, 0); }
+    40% { clip-path: inset(70% 0 15% 0); transform: translate(-3px, 0); }
+    50% { clip-path: inset(5% 0 85% 0); transform: translate(2px, 0); }
+    60% { clip-path: inset(40% 0 40% 0); transform: translate(-2px, 0); }
+    70% { clip-path: inset(85% 0 2% 0); transform: translate(2px, 0); }
+    80% { clip-path: inset(25% 0 55% 0); transform: translate(-2px, 0); }
+    90% { clip-path: inset(60% 0 20% 0); transform: translate(1px, 0); }
+    100% { clip-path: inset(15% 0 65% 0); transform: translate(-1px, 0); }
 }
 
 @keyframes glitch-anim-2 {
-    0% { clip-path: inset(60% 0 15% 0); transform: translate(4px, 0); }
-    10% { clip-path: inset(5% 0 75% 0); transform: translate(-4px, 0); }
-    20% { clip-path: inset(45% 0 35% 0); transform: translate(3px, 0); }
-    30% { clip-path: inset(85% 0 5% 0); transform: translate(-5px, 0); }
-    40% { clip-path: inset(15% 0 65% 0); transform: translate(5px, 0); }
-    50% { clip-path: inset(75% 0 10% 0); transform: translate(-3px, 0); }
-    60% { clip-path: inset(30% 0 50% 0); transform: translate(3px, 0); }
-    70% { clip-path: inset(10% 0 80% 0); transform: translate(-4px, 0); }
-    80% { clip-path: inset(55% 0 25% 0); transform: translate(4px, 0); }
-    90% { clip-path: inset(35% 0 45% 0); transform: translate(-2px, 0); }
-    100% { clip-path: inset(90% 0 2% 0); transform: translate(2px, 0); }
+    0% { clip-path: inset(60% 0 15% 0); transform: translate(2px, 0); }
+    10% { clip-path: inset(5% 0 75% 0); transform: translate(-2px, 0); }
+    20% { clip-path: inset(45% 0 35% 0); transform: translate(1px, 0); }
+    30% { clip-path: inset(85% 0 5% 0); transform: translate(-3px, 0); }
+    40% { clip-path: inset(15% 0 65% 0); transform: translate(3px, 0); }
+    50% { clip-path: inset(75% 0 10% 0); transform: translate(-2px, 0); }
+    60% { clip-path: inset(30% 0 50% 0); transform: translate(2px, 0); }
+    70% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 0); }
+    80% { clip-path: inset(55% 0 25% 0); transform: translate(2px, 0); }
+    90% { clip-path: inset(35% 0 45% 0); transform: translate(-1px, 0); }
+    100% { clip-path: inset(90% 0 2% 0); transform: translate(1px, 0); }
 }
 
 /* Event Theme */
 .event-theme {
-    font-size: 1.3rem;
-    font-weight: 500;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
     font-style: italic;
-    color: #d0f8ff;
-    letter-spacing: 0.05em;
+    color: #E4D8B4;
+    letter-spacing: 0.04em;
     margin-bottom: 25px;
-    text-shadow: 
-        0 0 3px #00f3ff,
-        0 0 8px #00f3ff,
-        0 0 18px rgba(0, 243, 255, 0.7);
+    text-shadow:
+        0 0 4px rgba(201, 162, 39, 0.5),
+        0 0 14px rgba(201, 162, 39, 0.25);
+}
+
+.event-theme::after {
+    content: "";
+    display: block;
+    width: 64px;
+    height: 1px;
+    margin: 14px auto 0;
+    background: linear-gradient(to right, transparent, rgba(201, 162, 39, 0.7), transparent);
 }
 
 /* Countdown Container */
@@ -234,44 +263,42 @@ body {
     align-items: center;
     gap: 20px;
     flex-wrap: nowrap;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
+    margin-top: 25px;
 }
 
 .time-box {
-    background: rgba(8, 20, 38, 0.65);
-    border: 1px solid rgba(0, 243, 255, 0.4);
-    border-radius: 12px;
+    background: rgba(15, 18, 28, 0.7);
+    border: 1px solid rgba(201, 162, 39, 0.35);
+    border-radius: 10px;
     padding: 15px 20px;
     min-width: 100px;
-    box-shadow: 
-        0 0 5px rgba(0, 243, 255, 0.3),
-        0 0 15px rgba(0, 243, 255, 0.2),
-        inset 0 0 10px rgba(0, 243, 255, 0.15);
+    box-shadow:
+        0 0 8px rgba(201, 162, 39, 0.15),
+        inset 0 0 10px rgba(201, 162, 39, 0.08);
     backdrop-filter: blur(5px);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .time-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 
-        0 0 8px #00f3ff,
-        0 0 25px rgba(0, 243, 255, 0.5),
-        inset 0 0 15px rgba(0, 243, 255, 0.3);
+    transform: translateY(-4px);
+    border-color: rgba(201, 162, 39, 0.7);
+    box-shadow:
+        0 0 10px rgba(201, 162, 39, 0.35),
+        inset 0 0 14px rgba(201, 162, 39, 0.18);
 }
 
 /* Numbers */
 .number {
     display: block;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 3.2rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 3rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #F6EFDD;
     line-height: 1;
-    text-shadow: 
-        0 0 2px #ffffff,
-        0 0 6px #00f3ff,
-        0 0 14px #00f3ff,
-        0 0 28px #00a8ff;
+    text-shadow:
+        0 0 3px rgba(246, 239, 221, 0.5),
+        0 0 12px rgba(201, 162, 39, 0.4);
     margin-bottom: 5px;
 }
 
@@ -279,13 +306,11 @@ body {
 .label {
     display: block;
     font-family: 'Rajdhani', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    color: #80f7ff;
-    text-shadow: 
-        0 0 2px #00f3ff,
-        0 0 6px rgba(0, 243, 255, 0.6);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    color: #9BA3B4;
+    text-shadow: 0 0 4px rgba(201, 162, 39, 0.3);
 }
 
 /* Button Group */
@@ -302,55 +327,51 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 10px 20px;
+    padding: 11px 22px;
     font-family: 'Rajdhani', sans-serif;
     font-size: 1rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     text-decoration: none;
-    border-radius: 8px;
-    background: rgba(3, 7, 18, 0.8);
+    border-radius: 6px;
+    background: rgba(6, 8, 15, 0.8);
     transition: all 0.3s ease;
     backdrop-filter: blur(4px);
 }
 
+/* Secondary action — quiet outline */
 .btn-instagram {
-    color: #ff66c4;
-    border: 1px solid rgba(255, 102, 196, 0.5);
-    text-shadow: 0 0 4px rgba(255, 102, 196, 0.6);
-    box-shadow: 
-        0 0 6px rgba(255, 102, 196, 0.2),
-        inset 0 0 6px rgba(255, 102, 196, 0.1);
+    color: #C9CFDB;
+    border: 1px solid rgba(201, 207, 219, 0.35);
+    text-shadow: 0 0 4px rgba(201, 207, 219, 0.25);
+    box-shadow:
+        0 0 6px rgba(201, 207, 219, 0.1),
+        inset 0 0 6px rgba(201, 207, 219, 0.06);
 }
 
 .btn-instagram:hover {
     color: #ffffff;
-    background: rgba(255, 102, 196, 0.15);
-    border-color: #ff66c4;
-    text-shadow: 0 0 8px #ff66c4;
-    box-shadow: 
-        0 0 12px rgba(255, 102, 196, 0.6),
-        inset 0 0 10px rgba(255, 102, 196, 0.2);
-    transform: translateY(-3px);
+    background: rgba(201, 207, 219, 0.08);
+    border-color: rgba(201, 207, 219, 0.7);
+    text-shadow: 0 0 6px rgba(201, 207, 219, 0.4);
+    box-shadow:
+        0 0 10px rgba(201, 207, 219, 0.25),
+        inset 0 0 8px rgba(201, 207, 219, 0.12);
+    transform: translateY(-2px);
 }
 
+/* Primary action — gold-foil emphasis */
 .btn-register {
-    color: #39ff14;
-    border: 1px solid rgba(57, 255, 20, 0.5);
-    text-shadow: 0 0 4px rgba(57, 255, 20, 0.6);
-    box-shadow: 
-        0 0 6px rgba(57, 255, 20, 0.2),
-        inset 0 0 6px rgba(57, 255, 20, 0.1);
+    color: #14171F;
+    background: linear-gradient(135deg, #E8C873, #C9A227);
+    border: 1px solid rgba(201, 162, 39, 0.9);
+    box-shadow: 0 0 12px rgba(201, 162, 39, 0.4);
 }
 
 .btn-register:hover {
-    color: #ffffff;
-    background: rgba(57, 255, 20, 0.15);
-    border-color: #39ff14;
-    text-shadow: 0 0 8px #39ff14;
-    box-shadow: 
-        0 0 12px rgba(57, 255, 20, 0.6),
-        inset 0 0 10px rgba(57, 255, 20, 0.2);
+    background: linear-gradient(135deg, #F1D98C, #D9AE33);
+    border-color: #F1D98C;
+    box-shadow: 0 0 18px rgba(201, 162, 39, 0.6);
     transform: translateY(-3px);
 }
 
@@ -362,21 +383,25 @@ body {
         padding: 5px 10px;
     }
     .coming-soon {
-        font-size: 0.75rem;
-        letter-spacing: 0.3em;
+        font-size: 0.7rem;
+        letter-spacing: 0.35em;
         margin-bottom: 2px;
     }
     .event-title {
-        font-size: 2.1rem;
+        font-size: 2rem;
         margin-bottom: 0px;
     }
     .event-theme {
         font-size: 0.85rem;
         margin-bottom: 12px;
     }
+    .event-theme::after {
+        margin: 8px auto 0;
+    }
     .countdown-container {
         gap: 10px;
         margin-bottom: 12px;
+        margin-top: 12px;
     }
     .time-box {
         padding: 6px 12px;
@@ -384,12 +409,12 @@ body {
         border-radius: 8px;
     }
     .number {
-        font-size: 1.8rem;
+        font-size: 1.7rem;
         margin-bottom: 2px;
     }
     .label {
-        font-size: 0.65rem;
-        letter-spacing: 0.1em;
+        font-size: 0.6rem;
+        letter-spacing: 0.12em;
     }
     .button-group {
         gap: 10px;
