@@ -6,23 +6,18 @@ function playBassTick() {
 
     const now = audioCtx.currentTime;
     
-    // Sub-oscillator (Sub-bass punch)
     const subOsc = audioCtx.createOscillator();
     const subGain = audioCtx.createGain();
 
-    // Main punch oscillator
     const mainOsc = audioCtx.createOscillator();
     const mainGain = audioCtx.createGain();
 
-    // Master Volume Booster
     const masterGain = audioCtx.createGain();
     
-    // Lowpass filter untuk memfokuskan frekuensi bass
     const filter = audioCtx.createBiquadFilter();
     filter.type = 'lowpass';
     filter.frequency.setValueAtTime(180, now);
 
-    // Dynamic Kick Envelope
     subOsc.type = 'sine';
     subOsc.frequency.setValueAtTime(150, now);
     subOsc.frequency.exponentialRampToValueAtTime(35, now + 0.12);
@@ -37,10 +32,8 @@ function playBassTick() {
     mainGain.gain.setValueAtTime(0.7, now);
     mainGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
 
-    // Penguat volume (Master Gain)
     masterGain.gain.setValueAtTime(2.5, now);
 
-    // Connect Node Network
     subOsc.connect(subGain);
     mainOsc.connect(mainGain);
 
@@ -50,7 +43,6 @@ function playBassTick() {
     filter.connect(masterGain);
     masterGain.connect(audioCtx.destination);
 
-    // Start & Stop Oscillators
     subOsc.start(now);
     mainOsc.start(now);
 
@@ -58,24 +50,63 @@ function playBassTick() {
     mainOsc.stop(now + 0.13);
 }
 
-// Fungsi untuk Fullscreen & Landscape otomatis (khusus Mobile/HP)
+// Fullscreen & Landscape helper
 function requestFullscreenAndLandscape() {
     const docElm = document.documentElement;
 
-    // Request Fullscreen (Mendukung berbagai prefix browser)
     if (docElm.requestFullscreen) {
         docElm.requestFullscreen().catch(err => console.log(err));
-    } else if (docElm.webkitRequestFullscreen) { /* Safari / WebKit */
+    } else if (docElm.webkitRequestFullscreen) {
         docElm.webkitRequestFullscreen().catch(err => console.log(err));
-    } else if (docElm.msRequestFullscreen) { /* IE/Edge */
+    } else if (docElm.msRequestFullscreen) {
         docElm.msRequestFullscreen().catch(err => console.log(err));
     }
 
-    // Lock Screen Orientation ke Landscape (jika didukung perangkat & browser)
     if (screen.orientation && screen.orientation.lock) {
         screen.orientation.lock('landscape').catch(err => console.log(err));
     } else if (screen.lockOrientation) {
         screen.lockOrientation('landscape').catch(err => console.log(err));
+    }
+}
+
+// REALTIME SKY THEME SWITCHER & STAR GENERATOR
+function updateSkyTheme() {
+    const hour = new Date().getHours();
+    const body = document.body;
+
+    body.classList.remove('sky-day', 'sky-sunset', 'sky-night');
+
+    if (hour >= 6 && hour < 15) {
+        body.classList.add('sky-day');
+    } else if (hour >= 15 && hour < 18) {
+        body.classList.add('sky-sunset');
+    } else {
+        body.classList.add('sky-night');
+    }
+}
+
+function generateStars() {
+    const starsContainer = document.getElementById('stars-container');
+    if (!starsContainer) return;
+    
+    starsContainer.innerHTML = '';
+    const starCount = 70;
+
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        
+        const size = Math.random() * 3 + 1;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.left = `${Math.random() * 100}%`;
+        
+        const duration = Math.random() * 3 + 1.5;
+        star.style.setProperty('--duration', `${duration}s`);
+        star.style.animationDelay = `${Math.random() * 3}s`;
+        
+        starsContainer.appendChild(star);
     }
 }
 
@@ -88,24 +119,18 @@ document.body.addEventListener('click', () => {
     if (!isStarted) {
         isStarted = true;
         
-        // Panggil fungsi Fullscreen & Landscape
         requestFullscreenAndLandscape();
-
-        // Inisialisasi Audio Context setelah interaksi user
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
         startScreen.classList.add('fade-out');
         mainContent.classList.remove('hidden');
 
-        // Play tick langsung begitu terbuka
         playBassTick();
     }
 });
 
-// Countdown Timer Logic
-// Tanggal target: 17 Desember 2026
-const targetDate = new Date('2026-12-17T00:00:00').getTime();
-
+// Target Date Countdown: 16 Desember 2026
+const targetDate = new Date('2026-12-16T00:00:00').getTime();
 let lastSecond = -1;
 
 function updateCountdown() {
@@ -130,13 +155,15 @@ function updateCountdown() {
     document.getElementById('minutes').innerText = minutes < 10 ? `0${minutes}` : minutes;
     document.getElementById('seconds').innerText = seconds < 10 ? `0${seconds}` : seconds;
 
-    // Bunyikan suara bass setiap detik berganti
     if (isStarted && lastSecond !== seconds) {
         playBassTick();
         lastSecond = seconds;
     }
 }
 
-// Jalankan per detik
+// Inisialisasi awal
+updateSkyTheme();
+generateStars();
+setInterval(updateSkyTheme, 60000); // Perbarui status langit tiap menit
 setInterval(updateCountdown, 1000);
 updateCountdown();
