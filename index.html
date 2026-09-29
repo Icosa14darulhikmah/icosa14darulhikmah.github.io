@@ -11,23 +11,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="sky-day">
     <!-- OVERLAY WELCOME / START SCREEN -->
     <div id="start-screen" class="start-screen">
         <p class="start-text">What's this? you might want to click your screen to find out.</p>
     </div>
 
-    <div class="grid-bg"></div>
-    <div class="glow-overlay"></div>
+    <!-- ADAPTIVE SKY BACKGROUND & CELESTIAL ELEMENTS -->
+    <div class="sky-background">
+        <div class="sun"></div>
+        <div class="moon"></div>
+        <div id="stars-container" class="stars-container"></div>
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+    </div>
 
-    <!-- MAIN CONTENT (HIDDEN INITIALLY) -->
+    <!-- MAIN CONTENT -->
     <div id="main-content" class="container hidden">
         <h2 class="coming-soon">COMING SOON</h2>
         
-        <!-- TEKS GLITCH NEON ICOSA 14 -->
-        <h1 class="event-title glitch" data-text="ICOSA 14">ICOSA 14</h1>
+        <!-- TITLE CLEAR FROM GLITCH -->
+        <h1 class="event-title">ICOSA 14</h1>
         
         <p class="event-theme">"The First Wings"</p>
+        <p class="event-date"><i class="fa-regular fa-calendar-days"></i> 16 Desember 2026</p>
 
         <div class="countdown-container">
             <div class="time-box">
