@@ -50,8 +50,8 @@ function playBassTick() {
     mainOsc.stop(now + 0.13);
 }
 
-// Fullscreen & Landscape helper
-function requestFullscreenAndLandscape() {
+// Fullscreen helper
+function requestFullscreenMode() {
     const docElm = document.documentElement;
 
     if (docElm.requestFullscreen) {
@@ -60,12 +60,6 @@ function requestFullscreenAndLandscape() {
         docElm.webkitRequestFullscreen().catch(err => console.log(err));
     } else if (docElm.msRequestFullscreen) {
         docElm.msRequestFullscreen().catch(err => console.log(err));
-    }
-
-    if (screen.orientation && screen.orientation.lock) {
-        screen.orientation.lock('landscape').catch(err => console.log(err));
-    } else if (screen.lockOrientation) {
-        screen.lockOrientation('landscape').catch(err => console.log(err));
     }
 }
 
@@ -119,7 +113,7 @@ document.body.addEventListener('click', () => {
     if (!isStarted) {
         isStarted = true;
         
-        requestFullscreenAndLandscape();
+        requestFullscreenMode();
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
         startScreen.classList.add('fade-out');
