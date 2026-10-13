@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ICOSA 14 - The First Wings</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/x-icon" href="/icon.ico">
+    <link rel="icon" type="image/x-icon" href="icon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
@@ -60,8 +60,52 @@
             <a href="https://www.instagram.com/official_icosa/" target="_blank" rel="noopener noreferrer" class="btn btn-instagram">
                 <i class="fa-brands fa-instagram"></i> Our Instagram
             </a>
+            <button type="button" id="openBtn" class="btn btn-instagram">
+                <i class="fa-regular fa-images"></i> What's on the list?
+            </button>
         </div>
     </div>
+
+    <!-- HIGHLIGHT STORY VIEWER -->
+  <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Highlight Me" aria-hidden="true">
+    <div class="viewer-bg" id="viewerBg"></div>
+
+    <button class="nav nav-prev" id="navPrev" type="button" aria-label="Sebelumnya">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+
+    <div class="story" id="story">
+      <div class="story-media" id="media">
+        <img class="story-bg" id="storyBg" alt="" draggable="false">
+        <img class="story-img" id="storyImg" alt="" draggable="false">
+      </div>
+
+      <div class="story-error" id="storyError" hidden></div>
+
+      <div class="shade-top"></div>
+
+      <div class="ui">
+        <div class="bars" id="bars"></div>
+        <header class="story-header">
+          <img class="avatar" id="avatar" src="p.png" alt="" draggable="false">
+          <span class="title">Me</span>
+          <div class="actions">
+            <button id="pauseBtn" type="button" aria-label="Pause"></button>
+            <button id="closeBtn" type="button" aria-label="Tutup">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg>
+            </button>
+          </div>
+        </header>
+      </div>
+
+      <div class="zone zone-prev" id="zonePrev"></div>
+      <div class="zone zone-next" id="zoneNext"></div>
+    </div>
+
+    <button class="nav nav-next" id="navNext" type="button" aria-label="Berikutnya">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+  </div>
 
     <script src="script.js"></script>
 </body>
