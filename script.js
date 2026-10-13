@@ -179,8 +179,14 @@ updateCountdown();
      ============================================================ */
   const ASSETS_DIR = "/assets/";
   const PHOTO_FILES = [
-    // "foto1.jpg",
-    // "foto2.jpg",
+  "foto1.jpg",
+  "foto2.png",
+  "foto3.jpg",
+  "foto4.jpg",
+  "foto5.jpg",
+  "foto6.jpg",
+  "foto7.jpg",
+  "foto8.jpg",
   ];
 
   const FADE_MS = 250;     // lama fade out / fade in antar story (ms)
