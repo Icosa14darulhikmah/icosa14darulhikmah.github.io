@@ -180,7 +180,7 @@ updateCountdown();
   const ASSETS_DIR = "assets/";
   const PHOTO_FILES = [
   "foto1.jpg",
-  "foto2.png",
+  "foto2.jpg",
   "foto3.jpg",
   "foto4.jpg",
   "foto5.jpg",
