@@ -177,7 +177,7 @@ updateCountdown();
                    (jalan di server yang nampilin directory listing,
                    mis. `python -m http.server`).
      ============================================================ */
-  const ASSETS_DIR = "/assets/";
+  const ASSETS_DIR = "assets/";
   const PHOTO_FILES = [
   "foto1.jpg",
   "foto2.png",
