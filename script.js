@@ -51,15 +51,12 @@ function playBassTick() {
 
 // Fullscreen helper
 function requestFullscreenMode() {
-    const docElm = document.documentElement;
-
-    if (docElm.requestFullscreen) {
-        docElm.requestFullscreen().catch(err => console.log(err));
-    } else if (docElm.webkitRequestFullscreen) {
-        docElm.webkitRequestFullscreen().catch(err => console.log(err));
-    } else if (docElm.msRequestFullscreen) {
-        docElm.msRequestFullscreen().catch(err => console.log(err));
-    }
+    const el = document.documentElement;
+    const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+    try {
+        const result = fn && fn.call(el);
+        if (result && result.catch) result.catch(() => {});
+    } catch (err) { /* browser tidak mendukung fullscreen */ }
 }
 
 // REALTIME SKY THEME SWITCHER & STAR GENERATOR
@@ -69,9 +66,9 @@ function updateSkyTheme() {
 
     body.classList.remove('sky-day', 'sky-sunset', 'sky-night');
 
-    if (hour >= 6 && hour < 15) {
+    if (hour >= 6 && hour < 16) {
         body.classList.add('sky-day');
-    } else if (hour >= 15 && hour < 18) {
+    } else if (hour >= 16 && hour < 18) {
         body.classList.add('sky-sunset');
     } else {
         body.classList.add('sky-night');
@@ -108,23 +105,36 @@ const startScreen = document.getElementById('start-screen');
 const mainContent = document.getElementById('main-content');
 let isStarted = false;
 
-document.body.addEventListener('click', () => {
-    if (!isStarted) {
-        isStarted = true;
-        
-        requestFullscreenMode();
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        startScreen.classList.add('fade-out');
-        mainContent.classList.remove('hidden');
+function startExperience() {
+    if (isStarted) return;
+    isStarted = true;
 
-        playBassTick();
+    startScreen.classList.add('fade-out');
+    startScreen.setAttribute('aria-hidden', 'true');
+    mainContent.classList.remove('hidden');
+
+    try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.resume) audioCtx.resume();
+    } catch (err) { audioCtx = null; }
+
+    requestFullscreenMode();
+    updateCountdown(); // tick pertama + sinkron lastSecond (tidak dobel)
+}
+
+startScreen.addEventListener('click', startExperience);
+startScreen.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        startExperience();
     }
 });
+startScreen.focus({ preventScroll: true });
 
 // Target Date Countdown: 16 Desember 2026
-const targetDate = new Date('2026-12-16T00:00:00').getTime();
+const targetDate = new Date('2026-12-16T00:00:00+07:00').getTime();
 let lastSecond = -1;
+let countdownTimer = null;
 
 function updateCountdown() {
     const now = new Date().getTime();
@@ -135,6 +145,9 @@ function updateCountdown() {
         document.getElementById('hours').innerText = "00";
         document.getElementById('minutes').innerText = "00";
         document.getElementById('seconds').innerText = "00";
+        const cs = document.getElementById('comingSoon');
+        if (cs) cs.textContent = "HARI-H TELAH TIBA";
+        clearInterval(countdownTimer);
         return;
     }
 
@@ -149,7 +162,7 @@ function updateCountdown() {
     document.getElementById('seconds').innerText = seconds < 10 ? `0${seconds}` : seconds;
 
     if (isStarted && lastSecond !== seconds) {
-        playBassTick();
+        if (!document.hidden) playBassTick();
         lastSecond = seconds;
     }
 }
@@ -158,7 +171,7 @@ function updateCountdown() {
 updateSkyTheme();
 generateStars();
 setInterval(updateSkyTheme, 60000); // Perbarui status langit tiap menit
-setInterval(updateCountdown, 1000);
+countdownTimer = setInterval(updateCountdown, 1000);
 updateCountdown();
 
 // ========================================================
@@ -247,7 +260,7 @@ updateCountdown();
 
   /* ---------- Load photo list ---------- */
   async function loadPhotos() {
-    if (PHOTO_FILES.length) return PHOTO_FILES.map((n) => ASSETS_DIR + n);
+    if (PHOTO_FILES.length) return PHOTO_FILES.map((n) => ASSETS_DIR + encodeURIComponent(n));
     try {
       const res = await fetch(ASSETS_DIR);
       const type = res.headers.get("content-type") || "";
@@ -395,7 +408,7 @@ updateCountdown();
     els.viewer.classList.add("open");
     els.viewer.setAttribute("aria-hidden", "false");
     document.body.classList.add("no-scroll");
-    els.closeBtn.focus({ preventScroll: true });
+    els.story.focus({ preventScroll: true }); // bukan tombol close, biar Space/Enter tidak menutup viewer
 
     if (!PHOTOS.length) PHOTOS = await loadPhotos();
     if (!isOpen) return; // ditutup selagi loading
@@ -586,5 +599,61 @@ updateCountdown();
       e.preventDefault();
       togglePause();
     }
+  });
+})();
+
+// ========================================================
+// POPUP DOWNLOAD JUKLAK JUKNIS LOMBA
+// ========================================================
+(() => {
+  "use strict";
+
+  const FILES = [
+    { name: "Badminton",      file: "pdf/Badminton.pdf" },
+    { name: "Futsal",         file: "pdf/Futsal.pdf" },
+    { name: "Hasta Karya",    file: "pdf/Hasta_Karya.pdf" },
+    { name: "Kaligrafi",      file: "pdf/Kaligrafi.pdf" },
+    { name: "LCCU",           file: "pdf/LCCU.pdf" },
+    { name: "MHQ",            file: "pdf/MHQ.pdf" },
+    { name: "Pidato",         file: "pdf/Pidato.pdf" },
+    { name: "Poster Digital", file: "pdf/Poster_Digital.pdf" },
+  ];
+
+  const modal = document.getElementById("juknisModal");
+  const openBtn = document.getElementById("downloadBtn");
+  const closeBtn = document.getElementById("juknisClose");
+  const list = document.getElementById("downloadList");
+  if (!modal || !openBtn || !list) return;
+
+  FILES.forEach(({ name, file }) => {
+    const a = document.createElement("a");
+    a.className = "download-item";
+    a.href = file;
+    a.download = file.split("/").pop();
+    a.innerHTML =
+      '<i class="fa-solid fa-file-pdf"></i><span></span><i class="fa-solid fa-download"></i>';
+    a.querySelector("span").textContent = name;
+    list.appendChild(a);
+  });
+
+  function openModal() {
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    closeBtn.focus({ preventScroll: true });
+  }
+
+  function closeModal() {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    openBtn.focus({ preventScroll: true });
+  }
+
+  openBtn.addEventListener("click", openModal);
+  closeBtn.addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal(); // klik area luar kartu
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
   });
 })();
