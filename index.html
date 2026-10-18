@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-site-verification" content="Wi1O4dJoqWozhbVH5Wjl9dhF_u3gZ2GrEzwVjeL6YhE" />
     <title>ICOSA 14 - The First Wings</title>
+    <meta name="description" content="ICOSA 14 - The First Wings. Coming soon, 16 Desember 2026.">
+    <meta name="theme-color" content="#0b1528">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="icon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,12 +14,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="sky-day">
-    <!-- OVERLAY WELCOME / START SCREEN -->
-    <div id="start-screen" class="start-screen">
+
+    <div id="start-screen" class="start-screen" role="button" tabindex="0">
         <p class="start-text">What's this? you might want to click your screen to find out.</p>
     </div>
 
-    <!-- ADAPTIVE SKY BACKGROUND & CELESTIAL ELEMENTS -->
+
     <div class="sky-background">
         <div class="sun"></div>
         <div class="moon"></div>
@@ -28,11 +29,11 @@
         <div class="cloud cloud-3"></div>
     </div>
 
-    <!-- MAIN CONTENT -->
+
     <div id="main-content" class="container hidden">
-        <h2 class="coming-soon">COMING SOON</h2>
+        <p class="coming-soon" id="comingSoon">COMING SOON</p>
         
-        <!-- TITLE CLEAR FROM GLITCH -->
+
         <h1 class="event-title">ICOSA 14</h1>
         
         <p class="event-theme">"The First Wings"</p>
@@ -64,10 +65,13 @@
             <button type="button" id="openBtn" class="btn btn-instagram">
                 <i class="fa-regular fa-images"></i> What's on the list?
             </button>
+            <button type="button" id="downloadBtn" class="btn btn-instagram">
+                <i class="fa-solid fa-file-arrow-down"></i> Download Juklak Juknis Lomba
+            </button>
         </div>
     </div>
 
-    <!-- HIGHLIGHT STORY VIEWER -->
+
   <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Highlight Me" aria-hidden="true">
     <div class="viewer-bg" id="viewerBg"></div>
 
@@ -75,7 +79,7 @@
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
     </button>
 
-    <div class="story" id="story">
+    <div class="story" id="story" tabindex="-1">
       <div class="story-media" id="media">
         <img class="story-bg" id="storyBg" alt="" draggable="false">
         <img class="story-img" id="storyImg" alt="" draggable="false">
@@ -107,6 +111,18 @@
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
     </button>
   </div>
+
+
+    <div class="modal" id="juknisModal" role="dialog" aria-modal="true" aria-labelledby="juknisTitle" aria-hidden="true">
+        <div class="modal-card">
+            <button type="button" class="modal-close" id="juknisClose" aria-label="Tutup">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="modal-title" id="juknisTitle">Juklak &amp; Juknis Lomba</h3>
+            <p class="modal-sub">Pilih lomba untuk mengunduh filenya</p>
+            <div class="download-list" id="downloadList"></div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
