@@ -4,6 +4,17 @@
     box-sizing: border-box;
 }
 
+html {
+    overscroll-behavior: none;
+}
+
+/* dikunci total saat story viewer terbuka (mencegah halaman ikut geser / pull-to-refresh di mobile) */
+html.no-scroll,
+body.no-scroll {
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
 body {
     color: #FFFFFF;
     font-family: 'Rajdhani', sans-serif;
@@ -482,7 +493,12 @@ button.btn {
 
 .viewer {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overscroll-behavior: none;
+  touch-action: none;
   z-index: 200;
   display: flex;
   align-items: center;
@@ -716,13 +732,17 @@ button.btn {
 
 @media (max-width: 600px) {
   .story {
-    width: 100vw;
-    height: 100%; /* Diubah agar tinggi fleksibel dan tidak bergetar mengikuti resize viewport */
-    max-height: 100vh;
-    max-height: 100dvh;
+    flex: none;
+    width: 100%;
+    height: 100%;
+    max-height: none;
     aspect-ratio: auto;
     border-radius: 0;
+    transform: none;
+    transition: none;
   }
+  /* di mobile story sudah full layar; blur 50px + scale di belakangnya cuma bikin berat & glitch */
+  .viewer-bg { display: none; }
   .viewer .nav { display: none; }
 }
 
