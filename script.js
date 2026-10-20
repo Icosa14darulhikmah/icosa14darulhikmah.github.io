@@ -408,6 +408,7 @@ updateCountdown();
     els.viewer.classList.add("open");
     els.viewer.setAttribute("aria-hidden", "false");
     document.body.classList.add("no-scroll");
+    document.documentElement.classList.add("no-scroll");
     els.story.focus({ preventScroll: true }); // bukan tombol close, biar Space/Enter tidak menutup viewer
 
     if (!PHOTOS.length) PHOTOS = await loadPhotos();
@@ -440,6 +441,7 @@ updateCountdown();
     els.viewer.classList.remove("open");
     els.viewer.setAttribute("aria-hidden", "true");
     document.body.classList.remove("no-scroll");
+    document.documentElement.classList.remove("no-scroll");
     els.openBtn.focus({ preventScroll: true });
   }
 
@@ -494,7 +496,8 @@ updateCountdown();
   els.story.addEventListener("contextmenu", (e) => e.preventDefault());
   
   // Mencegah getar / scroll bawaan layar handphone pada story
-  els.story.addEventListener("touchmove", (e) => {
+  // dipasang di seluruh viewer (bukan cuma .story) supaya gesture di area mana pun nggak menggeser halaman
+  els.viewer.addEventListener("touchmove", (e) => {
     e.preventDefault();
   }, { passive: false });
 
