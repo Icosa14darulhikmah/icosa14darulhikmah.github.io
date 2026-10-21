@@ -1,606 +1,830 @@
-let audioCtx;
-
-function playBassTick() {
-    if (!audioCtx) return;
-
-    const now = audioCtx.currentTime;
-    
-    const subOsc = audioCtx.createOscillator();
-    const subGain = audioCtx.createGain();
-
-    const mainOsc = audioCtx.createOscillator();
-    const mainGain = audioCtx.createGain();
-
-    const masterGain = audioCtx.createGain();
-    
-    const filter = audioCtx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(180, now);
-
-    subOsc.type = 'sine';
-    subOsc.frequency.setValueAtTime(150, now);
-    subOsc.frequency.exponentialRampToValueAtTime(35, now + 0.12);
-
-    subGain.gain.setValueAtTime(1.0, now);
-    subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-
-    mainOsc.type = 'triangle';
-    mainOsc.frequency.setValueAtTime(90, now);
-    mainOsc.frequency.exponentialRampToValueAtTime(25, now + 0.1);
-
-    mainGain.gain.setValueAtTime(0.7, now);
-    mainGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-
-    masterGain.gain.setValueAtTime(2.5, now);
-
-    subOsc.connect(subGain);
-    mainOsc.connect(mainGain);
-
-    subGain.connect(filter);
-    mainGain.connect(filter);
-
-    filter.connect(masterGain);
-    masterGain.connect(audioCtx.destination);
-
-    subOsc.start(now);
-    mainOsc.start(now);
-
-    subOsc.stop(now + 0.13);
-    mainOsc.stop(now + 0.13);
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-// Fullscreen helper
-function requestFullscreenMode() {
-    const el = document.documentElement;
-    const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
-    try {
-        const result = fn && fn.call(el);
-        if (result && result.catch) result.catch(() => {});
-    } catch (err) { /* browser tidak mendukung fullscreen */ }
+html {
+    overscroll-behavior: none;
 }
 
-// REALTIME SKY THEME SWITCHER & STAR GENERATOR
-function updateSkyTheme() {
-    const hour = new Date().getHours();
-    const body = document.body;
-
-    body.classList.remove('sky-day', 'sky-sunset', 'sky-night');
-
-    if (hour >= 6 && hour < 16) {
-        body.classList.add('sky-day');
-    } else if (hour >= 16 && hour < 18) {
-        body.classList.add('sky-sunset');
-    } else {
-        body.classList.add('sky-night');
-    }
+/* dikunci total saat story viewer terbuka (mencegah halaman ikut geser / pull-to-refresh di mobile) */
+html.no-scroll,
+body.no-scroll {
+    overflow: hidden;
+    overscroll-behavior: none;
 }
 
-function generateStars() {
-    const starsContainer = document.getElementById('stars-container');
-    if (!starsContainer) return;
-    
-    starsContainer.innerHTML = '';
-    const starCount = 70;
-
-    for (let i = 0; i < starCount; i++) {
-        const star = document.createElement('div');
-        star.classList.add('star');
-        
-        const size = Math.random() * 3 + 1;
-        star.style.width = `${size}px`;
-        star.style.height = `${size}px`;
-        star.style.top = `${Math.random() * 100}%`;
-        star.style.left = `${Math.random() * 100}%`;
-        
-        const duration = Math.random() * 3 + 1.5;
-        star.style.setProperty('--duration', `${duration}s`);
-        star.style.animationDelay = `${Math.random() * 3}s`;
-        
-        starsContainer.appendChild(star);
-    }
+body {
+    color: #FFFFFF;
+    font-family: 'Rajdhani', sans-serif;
+    height: 100vh;
+    height: 100dvh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    transition: background 1.5s ease;
 }
 
-// Interactive Click to Reveal
-const startScreen = document.getElementById('start-screen');
-const mainContent = document.getElementById('main-content');
-let isStarted = false;
-
-function startExperience() {
-    if (isStarted) return;
-    isStarted = true;
-
-    startScreen.classList.add('fade-out');
-    startScreen.setAttribute('aria-hidden', 'true');
-    mainContent.classList.remove('hidden');
-
-    try {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.resume) audioCtx.resume();
-    } catch (err) { audioCtx = null; }
-
-    requestFullscreenMode();
-    updateCountdown(); // tick pertama + sinkron lastSecond (tidak dobel)
+/* ========================================================
+   ADAPTIVE SKY BACKGROUNDS (DISESUAIKAN DENGAN SCRIPT JS)
+   ======================================================== */
+body.sky-day {
+    background: linear-gradient(180deg, #2b70d3 0%, #5294e2 40%, #87ceeb 100%);
 }
 
-startScreen.addEventListener('click', startExperience);
-startScreen.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        startExperience();
-    }
-});
-startScreen.focus({ preventScroll: true });
-
-// Target Date Countdown: 16 Desember 2026
-const targetDate = new Date('2026-12-16T00:00:00+07:00').getTime();
-let lastSecond = -1;
-let countdownTimer = null;
-
-function updateCountdown() {
-    const now = new Date().getTime();
-    const difference = targetDate - now;
-
-    if (difference <= 0) {
-        document.getElementById('days').innerText = "00";
-        document.getElementById('hours').innerText = "00";
-        document.getElementById('minutes').innerText = "00";
-        document.getElementById('seconds').innerText = "00";
-        const cs = document.getElementById('comingSoon');
-        if (cs) cs.textContent = "HARI-H TELAH TIBA";
-        clearInterval(countdownTimer);
-        return;
-    }
-
-    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-    document.getElementById('days').innerText = days < 10 ? `0${days}` : days;
-    document.getElementById('hours').innerText = hours < 10 ? `0${hours}` : hours;
-    document.getElementById('minutes').innerText = minutes < 10 ? `0${minutes}` : minutes;
-    document.getElementById('seconds').innerText = seconds < 10 ? `0${seconds}` : seconds;
-
-    if (isStarted && lastSecond !== seconds) {
-        if (!document.hidden) playBassTick();
-        lastSecond = seconds;
-    }
+body.sky-sunset {
+    background: linear-gradient(180deg, #233044 0%, #e85d04 55%, #ffba08 100%);
 }
 
-// Inisialisasi awal
-updateSkyTheme();
-generateStars();
-setInterval(updateSkyTheme, 60000); // Perbarui status langit tiap menit
-countdownTimer = setInterval(updateCountdown, 1000);
-updateCountdown();
+body.sky-night {
+    background: linear-gradient(180deg, #030712 0%, #0b1528 50%, #152238 100%);
+}
 
-// ========================================================
-// TOMBOL "WHAT'S ON THE LIST?" + HIGHLIGHT STORY VIEWER
-// ========================================================
-(() => {
-  "use strict";
+/* ========================================================
+   CELESTIAL BODIES (MATAHARI & BULAN)
+   ======================================================== */
+.sun,
+.moon {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+    transition: all 1.2s ease-in-out;
+}
 
-  /* ============================================================
-     EDIT BAGIAN INI
-     ASSETS_DIR  : lokasi folder foto, dilihat dari localhost.
-                   "/assets/"  -> folder assets ada di root server
-                   "../assets/" -> kalau html/css/js ada di subfolder
-     PHOTO_FILES : nama file foto, urutan = urutan story.
-                   Kosongin ([]) kalau mau otomatis baca isi folder
-                   (jalan di server yang nampilin directory listing,
-                   mis. `python -m http.server`).
-     ============================================================ */
-  const ASSETS_DIR = "assets/";
-  const PHOTO_FILES = [
-  "foto1.jpg",
-  "foto2.jpg",
-  "foto3.jpg",
-  "foto4.jpg",
-  "foto5.jpg",
-  "foto6.jpg",
-  "foto7.jpg",
-  "foto8.jpg",
-  ];
+/* Matahari Pagi/Siang */
+body.sky-day .sun {
+    top: 10%;
+    right: 12%;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 235, 150, 0.6) 45%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 50%;
+    box-shadow: 0 0 60px rgba(255, 240, 180, 0.8);
+    opacity: 0.85;
+}
 
-  const FADE_MS = 250;     // lama fade out / fade in antar story (ms)
-  const MAX_ZOOM = 4;      // zoom maksimal saat pinch
-  const DURATION = 5000;   // lama tiap story (ms)
-  const HOLD_DELAY = 200;  // tahan berapa lama dianggap "hold" (ms)
+/* Matahari Sore (Terbenam) */
+body.sky-sunset .sun {
+    top: 40%;
+    right: 15%;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(255, 220, 150, 0.9) 0%, rgba(255, 120, 60, 0.6) 50%, rgba(255, 80, 40, 0) 75%);
+    border-radius: 50%;
+    box-shadow: 0 0 70px rgba(255, 100, 50, 0.8);
+    opacity: 0.9;
+}
 
-  const IMAGE_EXT = /\.(jpe?g|png|webp|gif|avif)$/i;
-  let PHOTOS = [];
+/* Bulan Sabit Malam */
+body.sky-night .moon {
+    top: 12%;
+    right: 14%;
+    width: 85px;
+    height: 85px;
+    background: transparent;
+    border-radius: 50%;
+    box-shadow: 16px 10px 0 0 #fbf8cc;
+    filter: drop-shadow(0 0 20px rgba(251, 248, 204, 0.9));
+    opacity: 0.95;
+}
 
-  /* ---------- Elements ---------- */
-  const $ = (id) => document.getElementById(id);
-  const els = {
-    openBtn: $("openBtn"),
-    viewer: $("viewer"),
-    viewerBg: $("viewerBg"),
-    story: $("story"),
-    media: $("media"),
-    bg: $("storyBg"),
-    img: $("storyImg"),
-    bars: $("bars"),
-    avatar: $("avatar"),
-    pauseBtn: $("pauseBtn"),
-    closeBtn: $("closeBtn"),
-    zonePrev: $("zonePrev"),
-    zoneNext: $("zoneNext"),
-    error: $("storyError"),
-    navPrev: $("navPrev"),
-    navNext: $("navNext"),
-  };
+/* ========================================================
+   BINTANG-BINTANG MALAM (STARS)
+   ======================================================== */
+.stars-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+}
 
-  const ICON_PAUSE =
-    '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
-  const ICON_PLAY =
-    '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+body.sky-night .stars-container {
+    opacity: 1;
+}
 
-  document.documentElement.style.setProperty("--fade", FADE_MS + "ms");
+.star {
+    position: absolute;
+    background-color: #ffffff;
+    border-radius: 50%;
+    animation: twinkle var(--duration) infinite ease-in-out;
+    animation-play-state: paused;
+}
 
-  /* ---------- State ---------- */
-  let index = 0;
-  let elapsed = 0;
-  let last = null;
-  let raf = null;
-  let loaded = false;
-  let isOpen = false;
-  let manualPaused = false;
-  let holding = false;
-  let loadToken = 0;
-  let holdTimer = null;
-  let fills = [];
-  let anyLoaded = false;
-  let hasImage = false;
-  let zooming = false;
-  let suppressTap = false;
-  let wheelTimer = null;
-  const pointers = new Map();
-  let firstFailed = "";
+body.sky-night .star {
+    animation-play-state: running;
+}
 
-  /* ---------- Load photo list ---------- */
-  async function loadPhotos() {
-    if (PHOTO_FILES.length) return PHOTO_FILES.map((n) => ASSETS_DIR + encodeURIComponent(n));
-    try {
-      const res = await fetch(ASSETS_DIR);
-      const type = res.headers.get("content-type") || "";
-      if (res.ok && type.includes("text/html")) {
-        const doc = new DOMParser().parseFromString(await res.text(), "text/html");
-        const names = [...doc.querySelectorAll("a[href]")]
-          .map((a) => decodeURIComponent(a.getAttribute("href").split("?")[0]).split("/").pop())
-          .filter((n) => IMAGE_EXT.test(n));
-        const unique = [...new Set(names)].sort((a, b) =>
-          a.localeCompare(b, undefined, { numeric: true })
-        );
-        return unique.map((n) => ASSETS_DIR + encodeURIComponent(n));
-      }
-    } catch (err) {
-      console.warn("Gagal baca folder:", err);
-    }
-    return [];
-  }
+@keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.3); }
+}
 
-  function showError(msg) {
-    els.error.textContent = msg;
-    els.error.hidden = false;
-    els.media.style.visibility = "hidden";
-  }
+/* ========================================================
+   AWAN REALISTIK & BANYAK (REALISTIC CLOUDS)
+   ======================================================== */
+.clouds-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+}
 
-  function hideError() {
-    els.error.hidden = true;
-    els.media.style.visibility = "";
-  }
+.cloud {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.45);
+    border-radius: 100px;
+    filter: blur(4px);
+    z-index: 2;
+    animation: moveCloud var(--speed) linear infinite;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+}
 
-  /* ---------- Progress bars ---------- */
-  function buildBars() {
-    els.bars.innerHTML = "";
-    fills = PHOTOS.map(() => {
-      const bar = document.createElement("div");
-      bar.className = "bar";
-      const fill = document.createElement("i");
-      bar.appendChild(fill);
-      els.bars.appendChild(bar);
-      return fill;
-    });
-  }
+.cloud::before, .cloud::after {
+    content: '';
+    position: absolute;
+    background: inherit;
+    border-radius: 50%;
+}
 
-  function setProgress(p) {
-    fills.forEach((fill, i) => {
-      const v = i < index ? 1 : i === index ? Math.min(p, 1) : 0;
-      fill.style.transform = "scaleX(" + v + ")";
-    });
-  }
+.cloud::before {
+    width: 45%;
+    height: 140%;
+    top: -50%;
+    left: 15%;
+}
 
-  /* ---------- Showing a story ---------- */
-  function show(i) {
-    index = i;
-    elapsed = 0;
-    loaded = false;
-    const token = ++loadToken;
-    const src = PHOTOS[i];
+.cloud::after {
+    width: 35%;
+    height: 110%;
+    top: -35%;
+    right: 15%;
+}
 
-    resetZoom();
-    setProgress(0);
-    els.navPrev.classList.toggle("is-hidden", i === 0);
-    els.navNext.classList.toggle("is-hidden", i === PHOTOS.length - 1);
+/* Variasi Ukuran & Kecepatan Awan */
+.cloud-1 { width: 320px; height: 90px; top: 12%; left: -350px; --speed: 38s; }
+.cloud-2 { width: 480px; height: 130px; top: 38%; left: -520px; --speed: 55s; opacity: 0.35; }
+.cloud-3 { width: 260px; height: 75px; top: 62%; left: -300px; --speed: 32s; }
+.cloud-4 { width: 380px; height: 110px; top: 22%; left: -420px; --speed: 46s; }
+.cloud-5 { width: 420px; height: 120px; top: 75%; left: -460px; --speed: 50s; opacity: 0.25; }
 
-    // 1) story sebelumnya fade out
-    els.media.classList.remove("ready");
-    const fadeOut = new Promise((r) => setTimeout(r, hasImage ? FADE_MS : 0));
+/* Warna Awan Sesuai Tema Waktu */
+body.sky-sunset .cloud {
+    background: rgba(255, 190, 160, 0.5);
+}
 
-    // 2) sambil nunggu, foto berikutnya di-load
-    const probe = new Image();
-    const imageReady = new Promise((resolve, reject) => {
-      probe.onload = resolve;
-      probe.onerror = reject;
-    });
-    probe.src = src;
+body.sky-night .cloud {
+    background: rgba(18, 28, 48, 0.6);
+    filter: blur(8px);
+    box-shadow: none;
+}
 
-    // 3) setelah dua-duanya selesai, ganti foto lalu fade in
-    Promise.all([imageReady, fadeOut])
-      .then(() => {
-        if (token !== loadToken) return;
-        const cover = probe.naturalWidth / probe.naturalHeight < 0.6; // foto tinggi -> penuhi layar
-        els.media.classList.toggle("is-cover", cover);
-        els.img.classList.toggle("cover", cover);
-        els.img.src = src;
-        els.bg.src = src;
-        els.viewerBg.style.backgroundImage = 'url("' + src + '")';
-        hasImage = true;
-        anyLoaded = true;
-        requestAnimationFrame(() => els.media.classList.add("ready"));
-        loaded = true; // timer baru jalan setelah foto siap
-      })
-      .catch(() => {
-        if (token !== loadToken) return;
-        console.warn("Foto tidak ditemukan:", src);
-        if (!firstFailed) firstFailed = src;
-        if (!anyLoaded && index === PHOTOS.length - 1) {
-          showError("Foto nggak bisa dimuat.\nCoba buka langsung di browser:\n" + firstFailed);
-          return;
-        }
-        next();
-      });
+@keyframes moveCloud {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(100vw + 600px)); }
+}
 
-    if (PHOTOS[i + 1]) new Image().src = PHOTOS[i + 1]; // preload berikutnya
-  }
+/* ========================================================
+   START OVERLAY SCREEN
+   ======================================================== */
+.start-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000000;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
 
-  function next() {
-    if (index < PHOTOS.length - 1) show(index + 1);
-    else close();
-  }
+.start-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #f1e6c8;
+    letter-spacing: 0.06em;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    animation: pulseText 2.4s infinite alternate;
+}
 
-  function prev() {
-    show(index > 0 ? index - 1 : 0);
-  }
+@keyframes pulseText {
+    0% { opacity: 0.45; transform: scale(0.99); }
+    100% { opacity: 1; transform: scale(1.01); }
+}
 
-  /* ---------- Playback loop ---------- */
-  function isRunning() {
-    return isOpen && loaded && !manualPaused && !holding && !zooming;
-  }
+.start-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    cursor: default;
+}
 
-  function loop(ts) {
-    raf = requestAnimationFrame(loop);
-    if (last === null) { last = ts; return; }
-    const dt = Math.min(ts - last, 100);
-    last = ts;
-    if (!isRunning()) return;
-    elapsed += dt;
-    setProgress(elapsed / DURATION);
-    if (elapsed >= DURATION) next();
-  }
+/* ========================================================
+   MAIN CONTENT & GAMBAR BACK.JPG
+   ======================================================== */
+.container.hidden {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+}
 
-  /* ---------- Open / close ---------- */
-  async function open() {
-    if (isOpen) return;
-    isOpen = true;
-    manualPaused = false;
-    holding = false;
-    anyLoaded = false;
-    hasImage = false;
-    firstFailed = "";
-    els.media.classList.remove("ready");
-    resetZoom();
-    hideError();
-    els.story.classList.remove("holding");
-    els.pauseBtn.innerHTML = ICON_PAUSE;
-    els.pauseBtn.setAttribute("aria-label", "Pause");
-    els.viewer.classList.add("open");
-    els.viewer.setAttribute("aria-hidden", "false");
-    document.body.classList.add("no-scroll");
-    document.documentElement.classList.add("no-scroll");
-    els.story.focus({ preventScroll: true }); // bukan tombol close, biar Space/Enter tidak menutup viewer
+.container {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 30px;
+    max-width: 900px;
+    width: 100%;
+    transition: opacity 1s ease, transform 1s ease;
+    opacity: 1;
+    transform: scale(1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 
-    if (!PHOTOS.length) PHOTOS = await loadPhotos();
-    if (!isOpen) return; // ditutup selagi loading
+.container::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 600px;
+    max-width: 90vw;
+    height: 600px;
+    max-height: 80vh;
+    transform: translate(-50%, -50%);
+    background-image: url("back.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    opacity: 0.65;
+    z-index: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+}
 
-    if (!PHOTOS.length) {
-      buildBars();
-      showError(
-        "Belum ada foto.\nIsi PHOTO_FILES di script.js, atau pastikan " +
-          ASSETS_DIR + " bisa diakses."
-      );
-      return;
-    }
+body.sky-night .container::before {
+    opacity: 0.45;
+    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.2));
+}
 
-    buildBars();
-    show(0);
-    last = null;
-    cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(loop);
-  }
+.container > * {
+    position: relative;
+    z-index: 1;
+}
 
-  function close() {
-    isOpen = false;
-    loadToken++;
-    resetZoom();
-    pointers.clear();
-    suppressTap = false;
-    cancelAnimationFrame(raf);
-    clearTimeout(holdTimer);
-    els.viewer.classList.remove("open");
-    els.viewer.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("no-scroll");
-    document.documentElement.classList.remove("no-scroll");
-    els.openBtn.focus({ preventScroll: true });
-  }
+.coming-soon {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.55em;
+    color: #e2e8f0;
+    margin-bottom: 8px;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+}
 
-  function togglePause() {
-    manualPaused = !manualPaused;
-    els.pauseBtn.innerHTML = manualPaused ? ICON_PLAY : ICON_PAUSE;
-    els.pauseBtn.setAttribute("aria-label", manualPaused ? "Putar" : "Pause");
-  }
+.event-title {
+    font-family: 'Cinzel', serif;
+    font-size: 4.2rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    color: #ffffff;
+    margin-bottom: 6px;
+    text-shadow: 
+        0 0 15px rgba(255, 255, 255, 0.8),
+        0 0 30px rgba(0, 0, 0, 0.6);
+}
 
-  /* ---------- Tap + hold on the screen ---------- */
-  function bindZone(zone, onTap) {
-    let down = false;
+.event-theme {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    font-style: italic;
+    color: #f7fafc;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+}
 
-    const release = () => {
-      clearTimeout(holdTimer);
-      holding = false;
-      els.story.classList.remove("holding");
-    };
+.event-date {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: #e0f2fe;
+    margin-bottom: 25px;
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+}
 
-    zone.addEventListener("pointerdown", (e) => {
-      if (e.pointerType === "mouse" && e.button !== 0) return;
-      if (suppressTap || pointers.size >= 2) return; // lagi pinch
-      down = true;
-      clearTimeout(holdTimer);
-      holdTimer = setTimeout(() => {
-        holding = true;
-        els.story.classList.add("holding");
-      }, HOLD_DELAY);
-    });
+.event-date::after {
+    content: "";
+    display: block;
+    width: 80px;
+    height: 2px;
+    margin: 12px auto 0;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8), transparent);
+}
 
-    zone.addEventListener("pointerup", () => {
-      if (!down) return;
-      down = false;
-      const wasHolding = holding;
-      release();
-      if (!wasHolding && !suppressTap) onTap(); // tap singkat = pindah story
-    });
+.countdown-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: nowrap;
+    margin-bottom: 30px;
+    margin-top: 15px;
+}
 
-    ["pointerleave", "pointercancel"].forEach((ev) =>
-      zone.addEventListener(ev, () => {
-        if (!down) return;
-        down = false;
-        release();
-      })
-    );
-  }
+.time-box {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    padding: 16px 22px;
+    min-width: 105px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(8px);
+    transition: transform 0.3s ease, background 0.3s ease;
+}
 
-  bindZone(els.zonePrev, prev);
-  bindZone(els.zoneNext, next);
+body.sky-night .time-box {
+    background: rgba(10, 17, 40, 0.6);
+    border-color: rgba(255, 255, 255, 0.2);
+}
 
-  // cegah menu long-press (simpan gambar) di mobile
-  els.story.addEventListener("contextmenu", (e) => e.preventDefault());
-  
-  // Mencegah getar / scroll bawaan layar handphone pada story
-  // dipasang di seluruh viewer (bukan cuma .story) supaya gesture di area mana pun nggak menggeser halaman
-  els.viewer.addEventListener("touchmove", (e) => {
-    e.preventDefault();
-  }, { passive: false });
+.time-box:hover {
+    transform: translateY(-4px);
+    background: rgba(0, 0, 0, 0.5);
+}
 
-  /* ---------- Pinch to zoom ---------- */
-  const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y) || 1;
-  const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
-  let pinchStart = null;
+.number {
+    display: block;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 3.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    margin-bottom: 5px;
+}
 
-  function beginZoom(originX, originY) {
-    const r = els.media.getBoundingClientRect();
-    els.media.style.transformOrigin = originX - r.left + "px " + (originY - r.top) + "px";
-    zooming = true;
-    els.story.classList.add("zooming");
-  }
+.label {
+    display: block;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    color: #f1f5f9;
+}
 
-  function applyZoom(scale, dx, dy) {
-    els.media.style.transform = "translate(" + dx + "px," + dy + "px) scale(" + scale + ")";
-  }
+.button-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
 
-  // lepas jari = balik ke ukuran normal (kayak Instagram)
-  function resetZoom() {
-    clearTimeout(wheelTimer);
-    pinchStart = null;
-    zooming = false;
-    els.story.classList.remove("zooming");
-    els.media.style.transform = "";
-  }
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(6px);
+}
 
-  // capture phase: harus jalan sebelum handler tap di zone
-  els.story.addEventListener(
-    "pointerdown",
-    (e) => {
-      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      if (pointers.size === 2) {
-        suppressTap = true;
-        clearTimeout(holdTimer);
-        const [a, b] = [...pointers.values()];
-        const m = mid(a, b);
-        pinchStart = { dist: dist(a, b), mid: m };
-        beginZoom(m.x, m.y);
-      }
-    },
-    true
-  );
+.btn-instagram {
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
 
-  els.story.addEventListener("pointermove", (e) => {
-    if (!pointers.has(e.pointerId)) return;
-    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (!pinchStart || pointers.size < 2) return;
-    const [a, b] = [...pointers.values()];
-    const m = mid(a, b);
-    const scale = Math.min(MAX_ZOOM, Math.max(1, dist(a, b) / pinchStart.dist));
-    applyZoom(scale, m.x - pinchStart.mid.x, m.y - pinchStart.mid.y);
-  });
+.btn-instagram:hover {
+    background: rgba(0, 0, 0, 0.5);
+    transform: translateY(-2px);
+}
 
-  function endPointer(e) {
-    if (!pointers.delete(e.pointerId)) return;
-    if (pinchStart && pointers.size < 2) resetZoom();
-    if (pointers.size === 0) suppressTap = false;
-  }
-  els.story.addEventListener("pointerup", endPointer);
-  els.story.addEventListener("pointercancel", endPointer);
+.btn-register {
+    color: #0f172a;
+    background: #ffffff;
+    border: 1px solid #ffffff;
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.4);
+}
 
-  // trackpad pinch / Ctrl + scroll di desktop
-  let wheelScale = 1;
-  els.story.addEventListener(
-    "wheel",
-    (e) => {
-      if (!e.ctrlKey) return;
-      e.preventDefault();
-      if (!zooming) {
-        wheelScale = 1;
-        beginZoom(e.clientX, e.clientY);
-      }
-      wheelScale = Math.min(MAX_ZOOM, Math.max(1, wheelScale * Math.exp(-e.deltaY * 0.01)));
-      applyZoom(wheelScale, 0, 0);
-      clearTimeout(wheelTimer);
-      wheelTimer = setTimeout(resetZoom, 400);
-    },
-    { passive: false }
-  );
+.btn-register:hover {
+    background: #f8fafc;
+    box-shadow: 0 6px 24px rgba(255, 255, 255, 0.6);
+    transform: translateY(-3px);
+}
 
-  /* ---------- Buttons ---------- */
-  els.openBtn.addEventListener("click", open);
-  els.closeBtn.addEventListener("click", close);
-  els.pauseBtn.addEventListener("click", togglePause);
-  els.navPrev.addEventListener("click", prev);
-  els.navNext.addEventListener("click", next);
+/* Mobile Responsive */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .container { padding: 5px 10px; }
+    .container::before { width: 350px; height: 350px; }
+    .coming-soon { font-size: 0.75rem; margin-bottom: 2px; }
+    .event-title { font-size: 2.2rem; margin-bottom: 0px; }
+    .event-theme { font-size: 0.95rem; margin-bottom: 2px; }
+    .event-date { font-size: 0.8rem; margin-bottom: 8px; }
+    .event-date::after { margin: 4px auto 0; }
+    .countdown-container { gap: 10px; margin-bottom: 10px; margin-top: 6px; }
+    .time-box { padding: 6px 12px; min-width: 65px; border-radius: 8px; }
+    .number { font-size: 1.7rem; margin-bottom: 2px; }
+    .label { font-size: 0.6rem; }
+    .btn { padding: 6px 16px; font-size: 0.8rem; }
+}
 
-  // klik area gelap di luar story = tutup (desktop)
-  els.viewer.addEventListener("click", (e) => {
-    if (e.target === els.viewer || e.target === els.viewerBg) close();
-  });
+/* Portrait Responsive */
+@media screen and (orientation: portrait) {
+    .container { padding: 20px 14px; }
+    .container::before { width: 92vw; height: 92vw; }
+    .coming-soon { font-size: 1rem; letter-spacing: 0.4em; }
+    .event-title { font-size: clamp(2.6rem, 14vw, 4.2rem); }
+    .event-theme { font-size: 1.3rem; }
+    .event-date { font-size: 1rem; letter-spacing: 0.1em; }
+    .countdown-container { width: 100%; gap: 8px; }
+    .time-box { flex: 1 1 0; min-width: 0; padding: 12px 4px; }
+    .number { font-size: clamp(1.7rem, 9vw, 3.2rem); }
+    .label { font-size: 0.65rem; letter-spacing: 0.12em; }
+    .button-group { flex-direction: column; width: 100%; }
+    .btn { width: 100%; max-width: 320px; }
+    .start-text { font-size: 1.25rem; }
+}
 
-  /* ---------- Keyboard ---------- */
-  document.addEventListener("keydown", (e) => {
-    if (!isOpen) return;
-    if (e.key === "Escape") close();
-    else if (e.key === "ArrowRight") next();
-    else if (e.key === "ArrowLeft") prev();
-    else if (e.code === "Space" && !e.target.closest("button")) {
-      e.preventDefault();
-      togglePause();
-    }
-  });
-})();
+/* ========================================================
+   TOMBOL "WHAT'S ON THE LIST?" + COVERFLOW 3D POSTER
+   ======================================================== */
+button.btn { cursor: pointer; }
+
+.viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #050b18;
+    overflow: hidden;
+    overscroll-behavior: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .25s ease, visibility 0s linear .25s;
+}
+.viewer.open { opacity: 1; visibility: visible; transition: opacity .25s ease; }
+.viewer:focus { outline: none; }
+
+.viewer-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(60px) brightness(.4) saturate(1.3);
+    transform: scale(1.25);
+    transition: background-image .4s ease;
+}
+
+.cf-title {
+    position: relative;
+    z-index: 2;
+    margin: 0 16px 2.5vh;
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.3rem, 4.5vw, 2rem);
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-align: center;
+    text-shadow: 0 0 14px rgba(0, 0, 0, .6);
+}
+
+.cf-close {
+    position: absolute;
+    z-index: 6;
+    top: calc(env(safe-area-inset-top, 0px) + 14px);
+    right: 14px;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .12);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    cursor: pointer;
+    transition: background .2s ease;
+}
+.cf-close:hover { background: rgba(255, 255, 255, .28); }
+
+/* ---------- Stage ---------- */
+.cf-stage {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: min(62dvh, 600px, 96vw);
+    perspective: 1400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.cf-stage[hidden] { display: none; }
+.cf-stage.dragging { cursor: grabbing; }
+
+.cf-track {
+    position: relative;
+    height: 100%;
+    aspect-ratio: 3 / 4;
+    transform-style: preserve-3d;
+}
+
+.cf-card {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, .3);
+    border-radius: 14px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, .08);
+    box-shadow: 0 24px 50px rgba(0, 0, 0, .5);
+    cursor: pointer;
+    transition: transform .55s cubic-bezier(.22, .8, .25, 1), opacity .4s ease, filter .4s ease, box-shadow .4s ease;
+    will-change: transform;
+}
+.cf-card img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    -webkit-user-drag: none;
+}
+.cf-card.active {
+    border-color: rgba(255, 255, 255, .75);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .55), 0 0 40px rgba(255, 255, 255, .22);
+}
+.cf-card:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.cf-stage.dragging .cf-card { transition: none; }
+
+/* ---------- Footer ---------- */
+.cf-foot {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 3vh;
+}
+.cf-nav {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .12);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    cursor: pointer;
+    transition: background .2s ease, opacity .2s ease;
+}
+.cf-nav:hover:not(:disabled) { background: rgba(255, 255, 255, .28); }
+.cf-nav:disabled { opacity: .3; cursor: default; }
+.cf-nav:focus-visible, .cf-close:focus-visible, .cf-dots button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+.cf-dots { display: flex; align-items: center; gap: 8px; }
+.cf-dots button {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .35);
+    cursor: pointer;
+    transition: width .3s ease, background .3s ease;
+}
+.cf-dots button::after { content: ""; position: absolute; inset: -12px -4px; }
+.cf-dots button.on { width: 24px; background: #fff; }
+
+.cf-hint {
+    position: relative;
+    z-index: 2;
+    margin-top: 1.5vh;
+    padding: 0 16px;
+    font-size: .95rem;
+    font-weight: 600;
+    text-align: center;
+    color: rgba(255, 255, 255, .7);
+}
+
+.cf-error {
+    position: relative;
+    z-index: 2;
+    max-width: 420px;
+    padding: 0 20px;
+    text-align: center;
+    white-space: pre-line;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, .85);
+}
+.cf-error[hidden], .cf-zoom[hidden] { display: none; }
+
+/* ---------- Zoom (tap poster tengah) ---------- */
+.cf-zoom {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: grid;
+    place-items: center;
+    padding: 12px;
+    background: rgba(0, 0, 0, .9);
+    overflow: auto;
+    touch-action: pan-x pan-y pinch-zoom;
+    cursor: zoom-out;
+}
+.cf-zoom img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+@media (max-height: 500px) {
+    .cf-title { margin-bottom: 1vh; font-size: 1.1rem; }
+    .cf-stage { height: min(60dvh, 96vw); }
+    .cf-hint { display: none; }
+    .cf-foot { margin-top: 1.5vh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .viewer, .cf-card, .viewer-bg, .cf-dots button { transition: none; }
+}
+
+/* ========================================================
+   POPUP DOWNLOAD JUKLAK JUKNIS (GLASSMORPHISM)
+   ======================================================== */
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.35);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    cursor: default;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+}
+
+.modal.open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.25s ease;
+}
+
+.modal-card {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    padding: 30px 22px 22px;
+    text-align: center;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+    transform: translateY(14px) scale(0.97);
+    transition: transform 0.25s ease;
+}
+
+.modal.open .modal-card {
+    transform: none;
+}
+
+.modal-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #ffffff;
+    text-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+}
+
+.modal-sub {
+    margin: 6px 0 20px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: #f7fafc;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.download-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.download-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.28);
+    color: #ffffff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.download-item span {
+    flex: 1;
+}
+
+.download-item:hover {
+    background: rgba(0, 0, 0, 0.45);
+    transform: translateY(-2px);
+}
+
+.download-item:focus-visible,
+.modal-close:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+}
+
+@media (max-width: 420px) {
+    .download-list { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cloud, .star, .start-text { animation: none; }
+    .modal, .modal-card { transition: none; }
+}
