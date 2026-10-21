@@ -45,7 +45,7 @@
         <h1 class="event-title">ICOSA 14</h1>
         
         <p class="event-theme">"The First Wings"</p>
-        <p class="event-date"><i class="fa-regular fa-calendar-days"></i> 16 Desember 2026</p>
+        <p class="event-date"><i class="fa-regular fa-calendar-days"></i> 16 - 18 Desember 2026</p>
 
         <div class="countdown-container">
             <div class="time-box">
@@ -82,48 +82,34 @@
         </div>
     </div>
 
-    <!-- HIGHLIGHT STORY VIEWER -->
-  <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Highlight Me" aria-hidden="true">
-    <div class="viewer-bg" id="viewerBg"></div>
+    <!-- COVERFLOW POSTER VIEWER -->
+    <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Daftar lomba ICOSA 14" aria-hidden="true" tabindex="-1">
+        <div class="viewer-bg" id="viewerBg"></div>
 
-    <button class="nav nav-prev" id="navPrev" type="button" aria-label="Sebelumnya">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
-    </button>
+        <button class="cf-close" id="closeBtn" type="button" aria-label="Tutup">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg>
+        </button>
 
-    <div class="story" id="story" tabindex="-1">
-      <div class="story-media" id="media">
-        <img class="story-bg" id="storyBg" alt="" draggable="false">
-        <img class="story-img" id="storyImg" alt="" draggable="false">
-      </div>
+        <h2 class="cf-title">Competitions List</h2>
 
-      <div class="story-error" id="storyError" hidden></div>
+        <div class="cf-stage" id="stage">
+            <div class="cf-track" id="track"></div>
+        </div>
+        <p class="cf-error" id="cfError" hidden></p>
 
-      <div class="shade-top"></div>
-
-      <div class="ui">
-        <div class="bars" id="bars"></div>
-        <header class="story-header">
-          <img class="avatar" id="avatar" src="p.png" alt="" draggable="false">
-          <span class="title">Competitions List</span>
-          <div class="actions">
-            <button id="pauseBtn" type="button" aria-label="Pause"></button>
-            <button id="closeBtn" type="button" aria-label="Tutup">
-              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg>
+        <div class="cf-foot">
+            <button class="cf-nav" id="navPrev" type="button" aria-label="Sebelumnya">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
             </button>
-          </div>
-        </header>
-      </div>
+            <div class="cf-dots" id="dots"></div>
+            <button class="cf-nav" id="navNext" type="button" aria-label="Berikutnya">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+        <p class="cf-hint">Geser poster. Ketuk poster di tengah untuk memperbesar.</p>
 
-      <div class="zone zone-prev" id="zonePrev"></div>
-      <div class="zone zone-next" id="zoneNext"></div>
+        <div class="cf-zoom" id="zoom" hidden><img id="zoomImg" alt="Poster diperbesar" draggable="false"></div>
     </div>
-
-    <button class="nav nav-next" id="navNext" type="button" aria-label="Berikutnya">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
-    </button>
-  </div>
-
-
 
     <script src="script.js"></script>
 </body>
